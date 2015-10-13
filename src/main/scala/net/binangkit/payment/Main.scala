@@ -1,11 +1,16 @@
 package net.binangkit
 
 import org.http4s.dsl.{->, GET, Ok, OkSyntax, Root}
-import org.http4s.server.HttpService
+import org.http4s.server.{HttpService, Router}
 import org.http4s.server.blaze.BlazeBuilder
 
 object Main extends App {
-  val service = HttpService {
+
+  def service = Router(
+    "" -> rootService
+  )
+
+  def rootService = HttpService {
     case GET -> Root => Ok("Binangkit Payment")
   }
 
