@@ -8,7 +8,9 @@ lazy val root = (project in file(".")).
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-dsl" % http4sVersion,
       "org.http4s" %% "http4s-blaze-server" % http4sVersion,
-      "org.http4s" %% "http4s-blaze-client" % http4sVersion
+      "org.http4s" %% "http4s-blaze-client" % http4sVersion,
+      "org.http4s" %% "http4s-argonaut" % http4sVersion,
+      "io.argonaut" %% "argonaut" % "6.1"
     ),
     seq(Revolver.settings: _*)
   )

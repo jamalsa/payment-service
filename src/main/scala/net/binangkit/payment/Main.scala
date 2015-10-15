@@ -8,7 +8,8 @@ object Main extends App {
 
   def service = Router(
     "" -> rootService,
-    "/api" -> api.service
+    "/api" -> api.service,
+    "/dummy/pelangi" -> biller.pelangi.dummy.Dummy.service
   )
 
   def rootService = HttpService {
