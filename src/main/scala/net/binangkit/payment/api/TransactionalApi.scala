@@ -1,22 +1,22 @@
 package net.binangkit.payment.api
 
 import scalaz.concurrent.Task
-import org.http4s.Response
+import org.http4s.{Request, Response}
 import org.http4s.dsl.{->, /, GET, POST, Root}
 import org.http4s.server.HttpService
 
 trait TransactionalApi {
   def service = HttpService {
-    case GET -> Root / customerNo => inquiryHandler(customerNo)
+    case request@GET -> Root / customerNo => inquiryHandler(customerNo, request)
 
-    case POST -> Root / customerNo => paymentHandler(customerNo)
+    case request@POST -> Root / customerNo => paymentHandler(customerNo, request)
 
-    case GET -> Root / customerNo / "check" => adviceHandler(customerNo)
+    case request@POST -> Root / customerNo / "check" => adviceHandler(customerNo, request)
   }
 
-  def inquiryHandler(customerNo: String): Task[Response]
+  def inquiryHandler(customerNo: String, request: Request): Task[Response]
 
-  def paymentHandler(customerNo: String): Task[Response]
+  def paymentHandler(customerNo: String, request: Request): Task[Response]
 
-  def adviceHandler(customerNo: String): Task[Response]
+  def adviceHandler(customerNo: String, request: Request): Task[Response]
 }

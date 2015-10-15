@@ -1,32 +1,20 @@
 package net.binangkit.payment.api.pln
 
 import scalaz.concurrent.Task
-import org.http4s.{Response, Status}
-import org.http4s.dsl.{->, /, GET, POST, Ok, OkSyntax, Root}
-import org.http4s.server.HttpService
+import org.http4s.{Request, Response}
 
-trait Prepaid {
-  
-  def service = HttpService {
-    case GET -> Root / customerNo => inquiryHandler(customerNo)
+import net.binangkit.payment.api.TransactionalApi
+import net.binangkit.payment.biller.pelangi.{Prepaid => BillerPrepaid}
 
-    case POST -> Root / customerNo => paymentHandler(customerNo)
-
-    case GET -> Root / customerNo / "check" / trxId => adviceHandler(customerNo)
-  }
-
-  def inquiryHandler(customerNo: String): Task[Response]
-
-  def paymentHandler(customerNo: String): Task[Response]
-
-  def adviceHandler(customerNo: String): Task[Response]
-}
+trait Prepaid extends TransactionalApi
 
 object Prepaid extends Prepaid {
-  def inquiryHandler(customerNo: String): Task[Response] = Ok("Customer no:" + customerNo)
+  def inquiryHandler(customerNo: String, request: Request): Task[Response] = 
+    BillerPrepaid.inquiryHandler(customerNo, request)
 
-  def paymentHandler(customerNo: String): Task[Response] = Ok("Payment customer no:" + customerNo)
+  def paymentHandler(customerNo: String, request: Request): Task[Response] = 
+    BillerPrepaid.paymentHandler(customerNo, request)
 
-  def adviceHandler(customerNo: String, trxId: String): Task[Response] = 
-    Ok("Check customer no:" + customerNo + ", trxId: " + trxId)
+  def adviceHandler(customerNo: String, request: Request): Task[Response] = 
+    BillerPrepaid.adviceHandler(customerNo, request)
 }
