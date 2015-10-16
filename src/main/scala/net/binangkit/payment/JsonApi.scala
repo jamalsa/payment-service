@@ -1,14 +1,12 @@
 package net.binangkit.payment
 
-import java.util.UUID
-
 import argonaut.{DecodeJson, Json}
 import argonaut.Argonaut.{jArray, jString}
 
 import org.http4s.argonaut.{jsonEncoder => defaultJsonEncoder, jsonOf}
 
 
-trait JsonApi {
+trait JsonApi extends Util {
 
   implicit val jsonDecode = DecodeJson.JsonDecodeJson
   implicit val jsonDecoder = jsonOf[Json]
@@ -25,6 +23,4 @@ trait JsonApi {
       )
     )
   }
-
-  def generateUuid = UUID.randomUUID.toString
 }

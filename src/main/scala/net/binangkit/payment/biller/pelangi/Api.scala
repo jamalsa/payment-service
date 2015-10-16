@@ -6,11 +6,10 @@ import java.util.Date
 
 import scalaz.concurrent.Task
 
-import argonaut.{DecodeJson, Json}
-import argonaut.Argonaut.{jNumber, jString}
+import argonaut._, Argonaut._
+
 import org.http4s.Status.NotFound
 import org.http4s.Status.ResponseClass.Successful
-
 import org.http4s._
 import org.http4s.dsl._
 import org.http4s.client._
@@ -25,8 +24,8 @@ trait Api extends JsonApi {
 
   def paymentHandler(customerNo: String, request: Request, trxType: String): Task[Response]
 
-  val url = uri("http://103.16.138.19:8008/transactions/trx.json")
-  // val url = uri("http://127.0.0.1:8181/dummy/pelangi")
+  //val url = uri("http://103.16.138.19:8008/transactions/trx.json")
+  val url = uri("http://127.0.0.1:8181/dummy/pelangi")
   
   val username = "tns14110001"
   val password = "1234"
@@ -42,12 +41,12 @@ trait Api extends JsonApi {
 
   def generateTrxId(): String = (System.currentTimeMillis % 10000000000L).toString
 
-  def sendRequest(
+  def sendRequest[A](
     custNo: String, 
     nominal: String, 
     trxType: String, 
     trxId: String = generateTrxId
-  ) = {
+  )(implicit f: DecodeJson[A]) = {
 
     val trxDate = dtFormatter.format(new Date)
     val signature = md5(username+password+productId+trxDate+secretKey)
@@ -83,7 +82,10 @@ trait Api extends JsonApi {
           case None => "0005"
         }
         rc match {
-          case "0000" => json.fieldOrEmptyObject("data").fieldOrEmptyObject("trx")
+          case "0000" => {
+            val data = json.field("data").flatMap(_.field("trx")).getOrElse(jEmptyObject)
+            data.as[A].value.getOrElse(jsonError("0005", "0005", ""))
+          }
           case _ => jsonError(rc, rc, "")
         }
       }
