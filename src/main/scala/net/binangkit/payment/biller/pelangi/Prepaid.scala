@@ -20,7 +20,7 @@ object Prepaid extends BasePrepaid with Api with JsonApi {
     import Decoder.prepaidInquiryDecoder
     import InquiryEncoder.encoderOf
 
-    val result = sendRequest[PrepaidData](customerNo, "", "2100", "")
+    val result = sendRequest[PrepaidData](customerNo, "", "2100")
     result match {
       case p: PrepaidData => Ok(p)
       case j: Json => BadRequest(j)
@@ -36,7 +36,7 @@ object Prepaid extends BasePrepaid with Api with JsonApi {
       import Decoder.prepaidPaymentDecoder
       import PaymentEncoder.encoderOf
 
-      val result = sendRequest[PrepaidData](customerNo, nominal, trxType, "")
+      val result = sendRequest[PrepaidData](customerNo, nominal, trxType)
       result match {
         case p: PrepaidData => Ok(p)
         case j: Json => BadRequest(j)

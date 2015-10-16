@@ -44,8 +44,7 @@ trait Api extends JsonApi {
   def sendRequest[A](
     custNo: String, 
     nominal: String, 
-    trxType: String, 
-    trxId: String = generateTrxId
+    trxType: String
   )(implicit f: DecodeJson[A]) = {
 
     val trxDate = dtFormatter.format(new Date)
@@ -55,7 +54,7 @@ trait Api extends JsonApi {
     val data = UrlForm(
         "trx_date" -> trxDate,
         "trx_type" -> trxType,
-        "trx_id" -> trxId,
+        "trx_id" -> "",
         "cust_msisdn" -> "0",
         "cust_account_no" -> custNo,
         "product_id" -> productId,
