@@ -24,8 +24,8 @@ trait Api extends JsonApi {
 
   def paymentHandler(customerNo: String, request: Request, trxType: String): Task[Response]
 
-  //val url = uri("http://103.16.138.19:8008/transactions/trx.json")
-  val url = uri("http://127.0.0.1:8181/dummy/pelangi")
+  val url = uri("http://103.16.138.19:8008/transactions/trx.json")
+  //val url = uri("http://127.0.0.1:8181/dummy/pelangi")
   
   val username = "tns14110001"
   val password = "1234"
@@ -86,7 +86,8 @@ trait Api extends JsonApi {
             val data = json.field("data").flatMap(_.field("trx")).getOrElse(jEmptyObject)
             data.as[A].value.getOrElse(jsonError("0005", "0005", ""))
           }
-          case _ => jsonError(rc, rc, "")
+          case _ => 
+            jsonError(rc, rc, json.field("data").flatMap(_.field("trx")).flatMap(_.field("desc")).getOrElse(jEmptyString).stringOrEmpty)
         }
       }
       case resp => Task.now(jsonError(resp.status.code.toString, resp.status.reason, ""))

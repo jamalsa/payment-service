@@ -10,7 +10,7 @@ import org.http4s.{Request, Response, UrlForm}
 import org.http4s.dsl.{BadRequest, BadRequestSyntax, Ok, OkSyntax}
 
 import net.binangkit.payment.JsonApi
-import net.binangkit.payment.api.pln.{Prepaid => BasePrepaid, PrepaidData, PrepaidDataEncoder}
+import net.binangkit.payment.api.pln.{Prepaid => BasePrepaid, PrepaidData, InquiryEncoder, PaymentEncoder}
 
 object Prepaid extends BasePrepaid with Api with JsonApi {
   val productId = "80"
@@ -18,7 +18,7 @@ object Prepaid extends BasePrepaid with Api with JsonApi {
   def inquiryHandler(customerNo: String, request: Request): Task[Response] = {
 
     import Decoder.prepaidInquiryDecoder
-    import PrepaidDataEncoder.resultInquiryEncoder
+    import InquiryEncoder.encoderOf
 
     val result = sendRequest[PrepaidData](customerNo, "", "2100", "")
     result match {
@@ -33,11 +33,12 @@ object Prepaid extends BasePrepaid with Api with JsonApi {
       val id = data.getFirst("id").getOrElse("")
       val nominal = data.getFirst("nominal").getOrElse("0")
 
-      import Decoder.prepaidPaymentCodec
+      import Decoder.prepaidPaymentDecoder
+      import PaymentEncoder.encoderOf
 
-      val result = sendRequest[PrepaidData](customerNo, "", "2200", "")
+      val result = sendRequest[PrepaidData](customerNo, nominal, trxType, "")
       result match {
-        case p: PrepaidData => Ok("aja")
+        case p: PrepaidData => Ok(p)
         case j: Json => BadRequest(j)
         case _ => BadRequest(jsonError("0005", "0005", ""))
       }

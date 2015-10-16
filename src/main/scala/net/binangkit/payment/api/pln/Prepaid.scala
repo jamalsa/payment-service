@@ -32,6 +32,7 @@ case class PrepaidData(
   tarif: String,
   daya: Int,
   tokenUnsold: List[String],
+  idpel: String = "",
   noRef: String = "",
   rpBayar: BigDecimal = 0,
   meterai: BigDecimal = 0,
@@ -39,12 +40,12 @@ case class PrepaidData(
   ppj: BigDecimal = 0,
   angsuran: BigDecimal = 0,
   rpStroomToken: BigDecimal = 0,
-  jmlKwh: Double = 0,
+  jmlKwh: String = "",
   admin: BigDecimal = 0,
   token: String = "",
   infoText: String = "",
   id: String = Util.generateUuid,
-  extra: String = ""
+  flag: Int = 0
 )
 
 object PrepaidData {
@@ -71,6 +72,7 @@ object PrepaidData {
     daya: Int,
     tokenUnsold1: String,
     tokenUnsold2: String,
+    idpel: String,
     noRef: String,
     rpBayar: BigDecimal,
     meterai: BigDecimal,
@@ -78,7 +80,7 @@ object PrepaidData {
     ppj: BigDecimal,
     angsuran: BigDecimal,
     rpStroomToken: BigDecimal,
-    jmlKwh: Double,
+    jmlKwh: String,
     admin: BigDecimal,
     token: String,
     infoText: String
@@ -89,6 +91,7 @@ object PrepaidData {
         tarif, 
         daya, 
         List(tokenUnsold1, tokenUnsold2),
+        idpel,
         noRef,
         rpBayar,
         meterai,
@@ -102,11 +105,45 @@ object PrepaidData {
       )
 }
 
-object PrepaidDataEncoder {
+object InquiryEncoder {
 
-  implicit def inquiryEncoder: EncodeJson[PrepaidData] =
+  implicit def encoder: EncodeJson[PrepaidData] =
       EncodeJson((p: PrepaidData) => 
-        ("material_number" := p.nomorMeter) ->: ("subscriber_name" := p.nama) ->: ("subscriber_segmentation" := p.tarif) ->: ("power" := p.daya) ->: ("token_unsold" := p.tokenUnsold) ->: jEmptyObject)
+        ("id" := p.id) ->:
+        ("material_number" := p.nomorMeter) ->: 
+        ("subscriber_name" := p.nama) ->: 
+        ("subscriber_segmentation" := p.tarif) ->: 
+        ("power" := p.daya) ->: 
+        ("token_unsold" := p.tokenUnsold) ->: 
+        jEmptyObject
+      )
 
-  implicit def resultInquiryEncoder = jsonEncoderOf[PrepaidData]
+  implicit def encoderOf = jsonEncoderOf[PrepaidData]
+}
+
+object PaymentEncoder {
+
+  implicit def encoder: EncodeJson[PrepaidData] =
+      EncodeJson((p: PrepaidData) => 
+        ("id" := p.id) ->:
+        ("material_number" := p.nomorMeter) ->: 
+        ("idpel" := p.idpel) ->: 
+        ("subscriber_name" := p.nama) ->: 
+        ("subscriber_segmentation" := p.tarif) ->: 
+        ("power" := p.daya) ->: 
+        ("token_unsold" := p.tokenUnsold) ->: 
+        ("no_ref" := p.noRef) ->: 
+        ("rp_bayar" := p.rpBayar) ->: 
+        ("meterai" := p.meterai) ->: 
+        ("ppn" := p.ppn) ->: 
+        ("ppj" := p.ppj) ->: 
+        ("angsuran" := p.angsuran) ->: 
+        ("rp_stroom_token" := p.rpStroomToken) ->: 
+        ("jml_kwh" := p.jmlKwh) ->:        
+        ("admin" := p.admin) ->: 
+        ("token" := p.token) ->:  
+        jEmptyObject
+      )
+
+  implicit def encoderOf = jsonEncoderOf[PrepaidData]
 }
