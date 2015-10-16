@@ -62,7 +62,7 @@ object PrepaidData {
         nama, 
         tarif, 
         daya, 
-        List(tokenUnsold1, tokenUnsold2)
+        List(tokenUnsold1, tokenUnsold2).filter(!_.isEmpty)
       )
 
   def apply(
@@ -90,7 +90,7 @@ object PrepaidData {
         nama, 
         tarif, 
         daya, 
-        List(tokenUnsold1, tokenUnsold2),
+        List(tokenUnsold1, tokenUnsold2).filter(!_.isEmpty),
         idpel,
         noRef,
         rpBayar,
