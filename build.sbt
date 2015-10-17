@@ -1,3 +1,5 @@
+import ReleaseTransformations._
+
 lazy val http4sVersion = "0.10.0"
 lazy val doobieVersion = "0.2.2"
 
@@ -18,5 +20,16 @@ lazy val root = (project in file(".")).
       "org.tpolecat" %% "doobie-contrib-hikari" % doobieVersion,
       "mysql" % "mysql-connector-java" % "5.1.36"
     ),
-    seq(Revolver.settings: _*)
+    seq(Revolver.settings: _*),
+    releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,              // : ReleaseStep
+      inquireVersions,                        // : ReleaseStep
+      runTest,                                // : ReleaseStep
+      setReleaseVersion,                      // : ReleaseStep
+      commitReleaseVersion,                   // : ReleaseStep, performs the initial git checks
+      tagRelease,                             // : ReleaseStep
+      setNextVersion,                         // : ReleaseStep
+      commitNextVersion,                      // : ReleaseStep
+      pushChanges                             // : ReleaseStep, also checks that an upstream branch is properly configured
+    )
   )
