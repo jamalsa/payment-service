@@ -19,7 +19,7 @@ object Decoder {
 
       
   implicit def prepaidPaymentDecoder: DecodeJson[PrepaidData] =
-    jdecode18L(PrepaidData.apply)(
+    jdecode19L(PrepaidData.apply)(
       "material_number", 
       "subscriber_name", 
       "subscriber_segmentation", 
@@ -37,6 +37,7 @@ object Decoder {
       "power_purchase",
       "jml_kwh",
       "token",
-      "info_text"
+      "info_text",
+      "datetime"
     )
 }

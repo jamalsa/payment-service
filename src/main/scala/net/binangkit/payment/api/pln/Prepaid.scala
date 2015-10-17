@@ -44,6 +44,7 @@ case class PrepaidData(
   jmlKwh: String = "",
   token: String = "",
   infoText: String = "",
+  transactionTime: String = "",
   id: String = Util.generateUuid,
   flag: Int = 0
 )
@@ -85,7 +86,8 @@ object PrepaidData {
     rpStroomToken: BigDecimal,
     jmlKwh: String,
     token: String,
-    infoText: String
+    infoText: String,
+    transactionTime: String
   ): PrepaidData = 
       this(
         nomorMeter, 
@@ -104,7 +106,8 @@ object PrepaidData {
         rpStroomToken,
         jmlKwh,
         token,
-        infoText
+        infoText,
+        transactionTime
       )
 }
 
@@ -147,6 +150,7 @@ object PaymentEncoder {
         ("jml_kwh" := p.jmlKwh) ->:
         ("token" := p.token) ->:  
         ("info_text" := p.infoText) ->:
+        ("transaction_time" := p.transactionTime) ->:
         jEmptyObject
       )
 
