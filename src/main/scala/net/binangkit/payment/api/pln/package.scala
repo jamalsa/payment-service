@@ -6,6 +6,7 @@ package object pln {
   
   def service = Router(
     "/prepaid" -> Prepaid.service,
-    "/postpaid" -> Postpaid.service
+    "/postpaid" -> Postpaid.service,
+    "/nontaglis" -> Nontaglis.service
   )
 }

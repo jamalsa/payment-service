@@ -2,7 +2,7 @@ package net.binangkit.payment.biller.pelangi
 
 import argonaut._, Argonaut._
 
-import net.binangkit.payment.api.pln.{PostpaidData, PrepaidData}
+import net.binangkit.payment.api.pln.{NontaglisData, PostpaidData, PrepaidData}
 
 object Decoder {
 
@@ -63,6 +63,30 @@ object Decoder {
       "stand_meter_summary",
       "amount", 
       "datetime"
+    )
+
+  implicit def nontaglisInquiryDecoder: DecodeJson[NontaglisData] =
+    jdecode4L(NontaglisData.apply)(
+      "registration_no",
+      "transaction_name" ,
+      "subscriber_name", 
+      "amount"
+    )
+
+  
+  implicit def nontaglisPaymentDecoder: DecodeJson[NontaglisData] =
+    jdecode11L(NontaglisData.apply)(
+      "registration_no",
+      "transaction_name" ,
+      "subscriber_name", 
+      "amount",
+      "registration_date",
+      "subscriber_id",
+      "pln_bill",
+      "admin_charge",
+      "switcher_refno",
+      "datetime",
+      "info_text"
     )
 
 }
