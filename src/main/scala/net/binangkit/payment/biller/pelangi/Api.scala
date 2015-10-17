@@ -73,9 +73,9 @@ trait Api extends JsonApi {
     client(request).flatMap {
       case Successful(resp) => resp.as[Json].map{json =>
         val rc = json.field("data").flatMap(_.field("trx")).flatMap(_.field("rc")) match {
-          case Some(json) => {
-            if (json.isString) json.stringOr("0005") 
-            else if (json.isObject) json.objectValuesOr(List(jString("0005")))(0).stringOr("0005") 
+          case Some(rcVal) => {
+            if (rcVal.isString) rcVal.stringOr("0005") 
+            else if (rcVal.isObject) rcVal.objectValuesOr(List(jString("0005")))(0).stringOr("0005") 
             else "0005"
           }
           case None => "0005"
@@ -83,13 +83,13 @@ trait Api extends JsonApi {
         rc match {
           case "0000" => {
             val data = json.field("data").flatMap(_.field("trx")).getOrElse(jEmptyObject)
-            data.as[A].value.getOrElse(jsonError("0005", "0005", ""))
+            data.as[A].value.getOrElse(jsonError("0005", "0005", "Error when parsing biller data"))
           }
           case _ => 
             jsonError(rc, rc, json.field("data").flatMap(_.field("trx")).flatMap(_.field("desc")).getOrElse(jEmptyString).stringOrEmpty)
         }
       }
       case resp => Task.now(jsonError(resp.status.code.toString, resp.status.reason, ""))
-    }.run
+    }.attemptRun
   }
 }
