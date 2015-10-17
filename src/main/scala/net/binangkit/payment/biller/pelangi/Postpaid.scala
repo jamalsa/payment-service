@@ -12,19 +12,19 @@ import org.http4s.dsl.{BadRequest, BadRequestSyntax, Ok, OkSyntax}
 import doobie.imports._
 
 import net.binangkit.payment.{DB, JsonApi}
-import net.binangkit.payment.api.pln.{Prepaid => BasePrepaid, PrepaidData, PrepaidInquiryEncoder, PrepaidPaymentEncoder}
+import net.binangkit.payment.api.pln.{Postpaid => BasePostpaid, PostpaidData, PostpaidInquiryEncoder, PostpaidPaymentEncoder}
 
-object Prepaid extends BasePrepaid with Api with JsonApi with DB {
-  val productId = "80"
+object Postpaid extends BasePostpaid with Api with JsonApi with DB {
+  val productId = "100"
 
   def inquiryHandler(customerNo: String, request: Request): Task[Response] = {
 
-    import Decoder.prepaidInquiryDecoder
-    import PrepaidInquiryEncoder.encoderOf
+    import Decoder.postpaidInquiryDecoder
+    import PostpaidInquiryEncoder.encoderOf
 
-    sendRequest[PrepaidData](customerNo, "", "2100") match {
+    sendRequest[PostpaidData](customerNo, "", "2100") match {
       case \/-(p) => p match {
-        case d: PrepaidData => {
+        case d: PostpaidData => {
           insertInquiryToDB(d) match {
             case \/-(u) => Ok(d)
             case -\/(t) => BadRequest(
@@ -43,13 +43,13 @@ object Prepaid extends BasePrepaid with Api with JsonApi with DB {
     request.decode[UrlForm] {data =>
       val id = data.getFirst("id").getOrElse("")
       val nominal = data.getFirst("nominal").getOrElse("0")
+      
+      import Decoder.postpaidPaymentDecoder
+      import PostpaidPaymentEncoder.encoderOf
 
-      import Decoder.prepaidPaymentDecoder
-      import PrepaidPaymentEncoder.encoderOf
-
-      sendRequest[PrepaidData](customerNo, nominal, trxType) match {
+      sendRequest[PostpaidData](customerNo, nominal, trxType) match {
         case \/-(p) => p match {
-          case d: PrepaidData => {
+          case d: PostpaidData => {
             updatePaymentToDB(id, d) match {
               case \/-(u) => Ok(d.copy(id=id))
               case -\/(t) => BadRequest(
@@ -67,11 +67,11 @@ object Prepaid extends BasePrepaid with Api with JsonApi with DB {
 
   def adviceHandler(customerNo: String, request: Request): Task[Response] = paymentHandler(customerNo, request, "2220")
 
-  def insertInquiryToDB(data: PrepaidData) = {
+  def insertInquiryToDB(data: PostpaidData) = {
     val q = sql"""
-        insert into prepaid_transaction
-          (id, inquiry_time, nomor_meter, nama, tarif, daya, admin)
-          values(${data.id}, now(), ${data.nomorMeter}, ${data.nama}, ${data.tarif}, ${data.daya}, ${data.admin})
+        insert into postpaid_transaction
+          (id, inquiry_time, idpel, nama, jumlah_tagihan, blth, tagihan, admin)
+          values(${data.id}, now(), ${data.idpel}, ${data.nama}, ${data.jumlahTagihan}, ${data.blth}, ${data.tagihan}, ${data.admin})
       """.update
 
     val p: Task[Unit] = for {
@@ -82,12 +82,11 @@ object Prepaid extends BasePrepaid with Api with JsonApi with DB {
     p.attemptRun
   }
 
-  def updatePaymentToDB(id: String, data: PrepaidData) = {
+  
+  def updatePaymentToDB(id: String, data: PostpaidData) = {
     val q = sql"""
-        update prepaid_transaction
-          set flag = 1, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar}, meterai = ${data.meterai}, 
-          ppn = ${data.ppn}, ppj = ${data.ppj}, angsuran = ${data.angsuran}, 
-          rp_stroom_token = ${data.rpStroomToken}, jml_kwh = ${data.jmlKwh}, token = ${data.token}, 
+        update postpaid_transaction
+          set flag = 1, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar}, stand_meter = ${data.standMeter},  
           info_text = ${data.infoText}, payment_time=${data.transactionTime}
           where id = $id
       """.update

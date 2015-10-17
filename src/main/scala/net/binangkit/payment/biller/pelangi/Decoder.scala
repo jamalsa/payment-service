@@ -2,7 +2,7 @@ package net.binangkit.payment.biller.pelangi
 
 import argonaut._, Argonaut._
 
-import net.binangkit.payment.api.pln.PrepaidData
+import net.binangkit.payment.api.pln.{PostpaidData, PrepaidData}
 
 object Decoder {
 
@@ -16,7 +16,6 @@ object Decoder {
       "power_purchase_unsold2",
       "admin_charge"
     )
-
       
   implicit def prepaidPaymentDecoder: DecodeJson[PrepaidData] =
     jdecode19L(PrepaidData.apply)(
@@ -40,4 +39,30 @@ object Decoder {
       "info_text",
       "datetime"
     )
+
+  implicit def postpaidInquiryDecoder: DecodeJson[PostpaidData] =
+    jdecode6L(PostpaidData.apply)(
+      "subscriber_id", 
+      "subscriber_name", 
+      "bill_status", 
+      "blth_summary", 
+      "amount", 
+      "admin_charge"
+    )
+
+  
+  implicit def postpaidPaymentDecoder: DecodeJson[PostpaidData] =
+    jdecode10L(PostpaidData.apply)(
+      "subscriber_id", 
+      "subscriber_name", 
+      "bill_status", 
+      "blth_summary", 
+      "amount", 
+      "admin_charge",
+      "switcher_refno",
+      "stand_meter_summary",
+      "amount", 
+      "datetime"
+    )
+
 }

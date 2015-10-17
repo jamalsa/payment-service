@@ -21,9 +21,15 @@ object Dummy {
             case Some("2200") => Ok(prePayResp)
             case _ => BadRequest("Invalid trx_type")
           }
+          case Some("100") => data.getFirst("trx_type") match {
+            case Some("2100") => Ok(postInqResp)
+            case _ => BadRequest("Invalid trx_type")
+          }
           case _ => BadRequest("Invalid product_id")
         }
       }
     }
   }
+
+  val postInqResp = """{"data":{"trx":{"bill_status":"4","bills":[{"previous_meter_reading1":"02362500","incentive":"D0000000000","meter_read_date":"00000000","bill_period":"201409","total_electricity_bill":"00000114620","value_added_tax":"0000000000","current_meter_reading3":"00000000","produk":"PLNPOSTPAID","previous_meter_reading3":"00000000","current_meter_reading2":"00000000","penalty_fee":"000009000","current_meter_reading1":"02381400","due_date":"20092014","previous_meter_reading2":"00000000"},{"previous_meter_reading1":"02381400","incentive":"D0000000000","meter_read_date":"00000000","bill_period":"201410","total_electricity_bill":"00000110840","value_added_tax":"0000000000","current_meter_reading3":"00000000","produk":"PLNPOSTPAID","previous_meter_reading3":"00000000","current_meter_reading2":"00000000","penalty_fee":"000006000","current_meter_reading1":"02399600","due_date":"20102014","previous_meter_reading2":"00000000"},{"previous_meter_reading1":"02399600","incentive":"D0000000000","meter_read_date":"00000000","bill_period":"201411","total_electricity_bill":"00000099510","value_added_tax":"0000000000","current_meter_reading3":"00000000","produk":"PLNPOSTPAID","previous_meter_reading3":"00000000","current_meter_reading2":"00000000","penalty_fee":"000003000","current_meter_reading1":"02415700","due_date":"20112014","previous_meter_reading2":"00000000"},{"previous_meter_reading1":"02415700","incentive":"D0000000000","meter_read_date":"00000000","bill_period":"201412","total_electricity_bill":"00000080000","value_added_tax":"0000000000","current_meter_reading3":"00000000","produk":"PLNPOSTPAID","previous_meter_reading3":"00000000","current_meter_reading2":"00000000","penalty_fee":"000003000","current_meter_reading1":"02420000","due_date":"20122014","previous_meter_reading2":"00000000"}],"trx_id":"","datetime":"20151017154402","subscriber_id":"211001025251","subscriber_name":"DEVEL POSTPAID 5BLN TRX1 ","amount":"432370","stand_meter_summary":"02362500 - 02420000","subscriber_segmentation":"  R1","switcher_refno":"172E121B75E029AF617D142001632A2B","stan":"000000041532","terminal_id":"0000000000001374","blth_summary":"SEP14, OKT14, NOV14, DES14","admin_charge":"6400","merchant_code":"6021","outstanding_bill":"5","material_number":"","power":"900","bank_code":"4510017","rc":"0000"}}}"""
 }

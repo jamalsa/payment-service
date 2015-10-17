@@ -111,7 +111,7 @@ object PrepaidData {
       )
 }
 
-object InquiryEncoder {
+object PrepaidInquiryEncoder {
 
   implicit def encoder: EncodeJson[PrepaidData] =
       EncodeJson((p: PrepaidData) => 
@@ -128,7 +128,7 @@ object InquiryEncoder {
   implicit def encoderOf = jsonEncoderOf[PrepaidData]
 }
 
-object PaymentEncoder {
+object PrepaidPaymentEncoder {
 
   implicit def encoder: EncodeJson[PrepaidData] =
       EncodeJson((p: PrepaidData) => 
