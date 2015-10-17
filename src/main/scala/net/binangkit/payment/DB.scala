@@ -4,7 +4,15 @@ import scalaz.concurrent.Task
 
 import doobie.contrib.hikari.hikaritransactor._
 
-trait DB {
+trait DB extends Config {
+  
+  val dbConfig = config.getConfig("binangkit.db." + env)
+
   def getTransactor = 
-    HikariTransactor[Task]("com.mysql.jdbc.Driver", "jdbc:mysql://localhost/binangkit_payment", "root", "")
+    HikariTransactor[Task](
+      dbConfig.getString("driver"), 
+      dbConfig.getString("url"), 
+      dbConfig.getString("user"), 
+      dbConfig.getString("password")
+    )
 }

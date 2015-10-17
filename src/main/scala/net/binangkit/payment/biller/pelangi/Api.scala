@@ -15,21 +15,21 @@ import org.http4s.dsl._
 import org.http4s.client._
 import org.http4s.client.blaze.{defaultClient => client}
 
-import net.binangkit.payment.JsonApi
+import net.binangkit.payment.{Config, JsonApi}
 
-trait Api extends JsonApi {
+trait Api extends JsonApi with Config {
 
   def paymentHandler(customerNo: String, request: Request): Task[Response] = 
     paymentHandler(customerNo, request, "2200")
 
   def paymentHandler(customerNo: String, request: Request, trxType: String): Task[Response]
 
-  val url = uri("http://103.16.138.19:8008/transactions/trx.json")
-  //val url = uri("http://127.0.0.1:8181/dummy/pelangi")
+  val pelangiConfig = config.getConfig("binangkit.biller.pelangi." + env)
+  val url = Uri.fromString(pelangiConfig.getString("url")).toOption.getOrElse(uri("http://103.16.138.19:8008/transactions/trx.json"))
   
-  val username = "tns14110001"
-  val password = "1234"
-  val secretKey = "k6a4qeer1piwqfc"
+  val username = pelangiConfig.getString("username")
+  val password = pelangiConfig.getString("password")
+  val secretKey = pelangiConfig.getString("secretKey")
   val dtFormatter = new SimpleDateFormat("yyyyMMddHHmmss")
   def productId: String
 
@@ -50,6 +50,7 @@ trait Api extends JsonApi {
     val trxDate = dtFormatter.format(new Date)
     val signature = md5(username+password+productId+trxDate+secretKey)
     val authHeader = s"PELANGIREST username=$username&password=$password&signature=$signature"
+    println(authHeader)
     
     val data = UrlForm(
         "trx_date" -> trxDate,

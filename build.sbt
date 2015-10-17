@@ -18,7 +18,8 @@ lazy val root = (project in file(".")).
       "io.argonaut" %% "argonaut" % "6.1",
       "org.tpolecat" %% "doobie-core" % doobieVersion,
       "org.tpolecat" %% "doobie-contrib-hikari" % doobieVersion,
-      "mysql" % "mysql-connector-java" % "5.1.36"
+      "mysql" % "mysql-connector-java" % "5.1.36",
+      "com.typesafe" % "config" % "1.3.0"
     ),
     seq(Revolver.settings: _*),
     releaseProcess := Seq[ReleaseStep](
