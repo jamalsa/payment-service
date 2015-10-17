@@ -30,6 +30,5 @@ lazy val root = (project in file(".")).
       tagRelease,                             // : ReleaseStep
       setNextVersion,                         // : ReleaseStep
       commitNextVersion,                      // : ReleaseStep
-      pushChanges                             // : ReleaseStep, also checks that an upstream branch is properly configured
     )
   )
