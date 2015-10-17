@@ -2,6 +2,7 @@ lazy val http4sVersion = "0.10.0"
 lazy val doobieVersion = "0.2.2"
 
 lazy val root = (project in file(".")).
+  enablePlugins(JavaServerAppPackaging).
   settings(
     name := "binangkit-payment",
     organization := "net.binangkit",
