@@ -29,6 +29,6 @@ lazy val root = (project in file(".")).
       commitReleaseVersion,                   // : ReleaseStep, performs the initial git checks
       tagRelease,                             // : ReleaseStep
       setNextVersion,                         // : ReleaseStep
-      commitNextVersion,                      // : ReleaseStep
+      commitNextVersion                      // : ReleaseStep
     )
   )
