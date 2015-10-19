@@ -19,7 +19,8 @@ lazy val root = (project in file(".")).
       "org.tpolecat" %% "doobie-core" % doobieVersion,
       "org.tpolecat" %% "doobie-contrib-hikari" % doobieVersion,
       "mysql" % "mysql-connector-java" % "5.1.36",
-      "com.typesafe" % "config" % "1.3.0"
+      "com.typesafe" % "config" % "1.3.0",
+      "ch.qos.logback" % "logback-classic" % "1.0.13"
     ),
     seq(Revolver.settings: _*),
     releaseProcess := Seq[ReleaseStep](
