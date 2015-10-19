@@ -43,6 +43,7 @@ object Prepaid extends BasePrepaid with Api with JsonApi with DB {
     request.decode[UrlForm] {data =>
       val id = data.getFirst("id").getOrElse("")
       val nominal = data.getFirst("nominal").getOrElse("0")
+      val ppid = data.getFirst("ppid").getOrElse("NOPPID")
 
       import Decoder.prepaidPaymentDecoder
       import PrepaidPaymentEncoder.encoderOf
@@ -50,7 +51,7 @@ object Prepaid extends BasePrepaid with Api with JsonApi with DB {
       sendRequest[PrepaidData](customerNo, nominal, trxType) match {
         case \/-(p) => p match {
           case d: PrepaidData => {
-            updatePaymentToDB(id, d) match {
+            updatePaymentToDB(id, ppid, d) match {
               case \/-(u) => Ok(d.copy(id=id))
               case -\/(t) => BadRequest(
                 jsonError("0005", "0005", "Error when inserting payment data to database: " + t.getMessage)
@@ -82,10 +83,10 @@ object Prepaid extends BasePrepaid with Api with JsonApi with DB {
     p.attemptRun
   }
 
-  def updatePaymentToDB(id: String, data: PrepaidData) = {
+  def updatePaymentToDB(id: String, ppid: String, data: PrepaidData) = {
     val q = sql"""
         update prepaid_transaction
-          set flag = 1, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar}, meterai = ${data.meterai}, 
+          set flag = 1, ppid = $ppid, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar}, meterai = ${data.meterai}, 
           ppn = ${data.ppn}, ppj = ${data.ppj}, angsuran = ${data.angsuran}, 
           rp_stroom_token = ${data.rpStroomToken}, jml_kwh = ${data.jmlKwh}, token = ${data.token}, 
           info_text = ${data.infoText}, payment_time=${data.transactionTime}

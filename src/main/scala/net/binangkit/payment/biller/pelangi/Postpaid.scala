@@ -42,7 +42,8 @@ object Postpaid extends BasePostpaid with Api with JsonApi with DB {
   def paymentHandler(customerNo: String, request: Request, trxType: String): Task[Response] = {
     request.decode[UrlForm] {data =>
       val id = data.getFirst("id").getOrElse("")
-      val nominal = data.getFirst("nominal").getOrElse("0")
+      val nominal = data.getFirst("nominal").getOrElse("0")      
+      val ppid = data.getFirst("ppid").getOrElse("NOPPID")
       
       import Decoder.postpaidPaymentDecoder
       import PostpaidPaymentEncoder.encoderOf
@@ -50,7 +51,7 @@ object Postpaid extends BasePostpaid with Api with JsonApi with DB {
       sendRequest[PostpaidData](customerNo, nominal, trxType) match {
         case \/-(p) => p match {
           case d: PostpaidData => {
-            updatePaymentToDB(id, d) match {
+            updatePaymentToDB(id, ppid, d) match {
               case \/-(u) => Ok(d.copy(id=id))
               case -\/(t) => BadRequest(
                 jsonError("0005", "0005", "Error when inserting payment data to database: " + t.getMessage)
@@ -83,10 +84,10 @@ object Postpaid extends BasePostpaid with Api with JsonApi with DB {
   }
 
   
-  def updatePaymentToDB(id: String, data: PostpaidData) = {
+  def updatePaymentToDB(id: String, ppid: String, data: PostpaidData) = {
     val q = sql"""
         update postpaid_transaction
-          set flag = 1, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar}, stand_meter = ${data.standMeter},  
+          set flag = 1, ppid = $ppid, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar}, stand_meter = ${data.standMeter},  
           info_text = ${data.infoText}, payment_time=${data.transactionTime}
           where id = $id
       """.update
