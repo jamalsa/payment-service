@@ -50,7 +50,6 @@ trait Api extends JsonApi with Config {
     val trxDate = dtFormatter.format(new Date)
     val signature = md5(username+password+productId+trxDate+secretKey)
     val authHeader = s"PELANGIREST username=$username&password=$password&signature=$signature"
-    println(authHeader)
     
     val data = UrlForm(
         "trx_date" -> trxDate,
