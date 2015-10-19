@@ -1,5 +1,7 @@
 package net.binangkit.payment
 
+import scala.concurrent.duration.Duration
+
 import org.http4s.dsl.{/, ->, GET, Ok, OkSyntax, Root}
 import org.http4s.server.{HttpService, Router}
 import org.http4s.server.blaze.BlazeBuilder
@@ -20,6 +22,7 @@ object Main extends App with Config {
 
   BlazeBuilder
     .bindHttp(8181)
+    .withIdleTimeout(Duration.Inf)
     .mountService(service, "/")
     .run
     .awaitShutdown
