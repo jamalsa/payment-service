@@ -4,7 +4,7 @@ import org.http4s.dsl.{/, ->, GET, Ok, OkSyntax, Root}
 import org.http4s.server.{HttpService, Router}
 import org.http4s.server.blaze.BlazeBuilder
 
-object Main extends App {
+object Main extends App with Config {
 
   def service = Router(
     "" -> rootService,
@@ -15,6 +15,8 @@ object Main extends App {
   def rootService = HttpService {
     case GET -> Root => Ok("Binangkit Payment")
   }
+
+  println("Starting server on port 8181 with environment " + env)
 
   BlazeBuilder
     .bindHttp(8181)
