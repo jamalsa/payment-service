@@ -8,6 +8,8 @@ import org.http4s.server.blaze.BlazeBuilder
 
 object Main extends App with Config {
 
+  val port = config.getInt(s"binangkit.port.$env")
+
   def service = Router(
     "" -> rootService,
     "/api" -> api.service,
