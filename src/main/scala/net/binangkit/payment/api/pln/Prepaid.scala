@@ -55,6 +55,22 @@ object PrepaidData {
     nama: String,
     tarif: String,
     daya: Int,
+    admin: BigDecimal
+  ): PrepaidData = 
+      this(
+        nomorMeter, 
+        nama, 
+        tarif, 
+        daya, 
+        List(),
+        admin
+      )
+
+  def apply(
+    nomorMeter: String,
+    nama: String,
+    tarif: String,
+    daya: Int,
     tokenUnsold1: String,
     tokenUnsold2: String,
     admin: BigDecimal

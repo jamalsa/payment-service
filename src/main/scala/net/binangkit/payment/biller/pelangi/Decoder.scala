@@ -7,13 +7,11 @@ import net.binangkit.payment.api.pln.{NontaglisData, PostpaidData, PrepaidData}
 object Decoder {
 
   implicit def prepaidInquiryDecoder: DecodeJson[PrepaidData] =
-    jdecode7L(PrepaidData.apply)(
+    jdecode5L(PrepaidData.apply)(
       "material_number", 
       "subscriber_name", 
       "subscriber_segmentation", 
       "power", 
-      "power_purchase_unsold", 
-      "power_purchase_unsold2",
       "admin_charge"
     )
       
