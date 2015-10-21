@@ -20,10 +20,10 @@ object Main extends App with Config {
     case GET -> Root => Ok("Binangkit Payment")
   }
 
-  println("Starting server on port 8181 with environment " + env)
+  println(s"Starting server on port $port with environment $env")
 
   BlazeBuilder
-    .bindHttp(8181)
+    .bindHttp(port)
     .withIdleTimeout(Duration.Inf)
     .mountService(service, "/")
     .run
