@@ -51,7 +51,7 @@ object PostpaidData {
     nama: String,
     jumlahTagihan: Int,
     blth:  String,
-    tagihan: BigDecimal,
+    rpBayar: BigDecimal,
     admin: BigDecimal
   ): PostpaidData = 
       PostpaidData(
@@ -59,7 +59,7 @@ object PostpaidData {
         nama, 
         jumlahTagihan, 
         blth, 
-        tagihan,
+        rpBayar - admin,
         admin,
         ""
       )
@@ -69,11 +69,10 @@ object PostpaidData {
     nama: String,
     jumlahTagihan: Int,
     blth:  String,
-    tagihan: BigDecimal,
+    rpBayar: BigDecimal,
     admin: BigDecimal,
     noRef: String,
     standMeter: String,
-    rpBayar: BigDecimal,
     transactionTime: String
   ): PostpaidData = 
       this(
@@ -81,7 +80,7 @@ object PostpaidData {
         nama, 
         jumlahTagihan, 
         blth, 
-        tagihan,
+        rpBayar - admin,
         admin,
         noRef,
         standMeter,
