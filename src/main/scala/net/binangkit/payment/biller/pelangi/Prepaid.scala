@@ -15,7 +15,7 @@ import net.binangkit.payment.{DB, JsonApi}
 import net.binangkit.payment.api.pln.{Prepaid => BasePrepaid, PrepaidData, PrepaidInquiryEncoder, PrepaidPaymentEncoder}
 
 object Prepaid extends BasePrepaid with ScalajApi with JsonApi with DB {
-  val productId = "80"
+  val productId = pelangiConfig.getString("product.prepaid")
 
   def inquiryHandler(customerNo: String, request: Request): Task[Response] = {
 

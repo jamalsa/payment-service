@@ -15,7 +15,7 @@ import net.binangkit.payment.{DB, JsonApi}
 import net.binangkit.payment.api.pln.{Postpaid => BasePostpaid, PostpaidData, PostpaidInquiryEncoder, PostpaidPaymentEncoder}
 
 object Postpaid extends BasePostpaid with ScalajApi with JsonApi with DB {
-  val productId = "100"
+  val productId = pelangiConfig.getString("product.postpaid")
 
   def inquiryHandler(customerNo: String, request: Request): Task[Response] = {
 

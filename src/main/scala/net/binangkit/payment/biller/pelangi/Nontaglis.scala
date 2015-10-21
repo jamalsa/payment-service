@@ -15,7 +15,7 @@ import net.binangkit.payment.{DB, JsonApi}
 import net.binangkit.payment.api.pln.{Nontaglis => BaseNontaglis, NontaglisData, NontaglisInquiryEncoder, NontaglisPaymentEncoder}
 
 object Nontaglis extends BaseNontaglis with ScalajApi with JsonApi with DB {
-  val productId = "105"
+  val productId = pelangiConfig.getString("product.nontaglis")
 
   def inquiryHandler(customerNo: String, request: Request): Task[Response] = {
 
