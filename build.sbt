@@ -21,7 +21,8 @@ lazy val root = (project in file(".")).
       "mysql" % "mysql-connector-java" % "5.1.36",
       "com.typesafe" % "config" % "1.3.0",
       "ch.qos.logback" % "logback-classic" % "1.0.13",
-      "org.log4s" %% "log4s" % "1.1.5"
+      "org.log4s" %% "log4s" % "1.1.5",
+      "org.scalaj" %% "scalaj-http" % "1.1.5"
     ),
     seq(Revolver.settings: _*),
     releaseProcess := Seq[ReleaseStep](

@@ -14,7 +14,7 @@ import doobie.imports._
 import net.binangkit.payment.{DB, JsonApi}
 import net.binangkit.payment.api.pln.{Nontaglis => BaseNontaglis, NontaglisData, NontaglisInquiryEncoder, NontaglisPaymentEncoder}
 
-object Nontaglis extends BaseNontaglis with Api with JsonApi with DB {
+object Nontaglis extends BaseNontaglis with ScalajApi with JsonApi with DB {
   val productId = "105"
 
   def inquiryHandler(customerNo: String, request: Request): Task[Response] = {
@@ -32,10 +32,12 @@ object Nontaglis extends BaseNontaglis with Api with JsonApi with DB {
             )
           }
         }
-        case j: Json => BadRequest(j)
         case _ => BadRequest(jsonError("0005", "0005", ""))
       }
-      case -\/(t) => BadRequest(jsonError("0005", "0005", t.getMessage))
+      case -\/(t) => {
+        val msg = t.getMessage.split(";")
+        BadRequest(jsonError(msg(0), msg(1), msg(2)))
+      }
     }
   }
 
@@ -58,10 +60,12 @@ object Nontaglis extends BaseNontaglis with Api with JsonApi with DB {
               )
             }
           }
-          case j: Json => BadRequest(j)
           case _ => BadRequest(jsonError("0005", "0005", ""))
         }
-        case -\/(t) => BadRequest(jsonError("0005", "0005", t.getMessage))
+        case -\/(t) => {
+          val msg = t.getMessage.split(";")
+          BadRequest(jsonError(msg(0), msg(1), msg(2)))
+        }
       }
     }
   }

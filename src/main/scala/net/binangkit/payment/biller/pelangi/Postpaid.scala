@@ -14,7 +14,7 @@ import doobie.imports._
 import net.binangkit.payment.{DB, JsonApi}
 import net.binangkit.payment.api.pln.{Postpaid => BasePostpaid, PostpaidData, PostpaidInquiryEncoder, PostpaidPaymentEncoder}
 
-object Postpaid extends BasePostpaid with Api with JsonApi with DB {
+object Postpaid extends BasePostpaid with ScalajApi with JsonApi with DB {
   val productId = "100"
 
   def inquiryHandler(customerNo: String, request: Request): Task[Response] = {
@@ -32,10 +32,12 @@ object Postpaid extends BasePostpaid with Api with JsonApi with DB {
             )
           }
         }
-        case j: Json => BadRequest(j)
         case _ => BadRequest(jsonError("0005", "0005", ""))
       }
-      case -\/(t) => BadRequest(jsonError("0005", "0005", t.getMessage))
+      case -\/(t) => {
+        val msg = t.getMessage.split(";")
+        BadRequest(jsonError(msg(0), msg(1), msg(2)))
+      }
     }
   }
 
@@ -52,16 +54,18 @@ object Postpaid extends BasePostpaid with Api with JsonApi with DB {
         case \/-(p) => p match {
           case d: PostpaidData => {
             updatePaymentToDB(id, ppid, d) match {
-              case \/-(u) => Ok(d.copy(id=id))
+              case \/-(u) => Ok(d)
               case -\/(t) => BadRequest(
-                jsonError("0005", "0005", "Error when inserting payment data to database: " + t.getMessage)
+                jsonError("0005", "0005", "Error when inserting inquiry data to database: " + t.getMessage)
               )
             }
           }
-          case j: Json => BadRequest(j)
           case _ => BadRequest(jsonError("0005", "0005", ""))
         }
-        case -\/(t) => BadRequest(jsonError("0005", "0005", t.getMessage))
+        case -\/(t) => {
+          val msg = t.getMessage.split(";")
+          BadRequest(jsonError(msg(0), msg(1), msg(2)))
+        }
       }
     }
   }
