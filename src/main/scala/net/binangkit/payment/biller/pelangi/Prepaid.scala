@@ -80,9 +80,7 @@ object Prepaid extends BasePrepaid with ScalajApi with JsonApi with DB {
       """.update
 
     val p: Task[Unit] = for {
-      xa <- getTransactor
-      _ <- q.run.transact(xa) 
-      _ <- xa.shutdown
+      _ <- q.run.transact(getTransactor) 
     } yield ()
     p.attemptRun
   }
@@ -98,9 +96,7 @@ object Prepaid extends BasePrepaid with ScalajApi with JsonApi with DB {
       """.update
 
     val p: Task[Unit] = for {
-      xa <- getTransactor
-      _ <- q.run.transact(xa) 
-      _ <- xa.shutdown
+      _ <- q.run.transact(getTransactor) 
     } yield ()
     p.attemptRun
   }
