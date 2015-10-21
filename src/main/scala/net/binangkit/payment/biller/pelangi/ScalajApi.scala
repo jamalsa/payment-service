@@ -17,7 +17,6 @@ import scalaj.http.{Http, HttpOptions}
 
 import org.log4s._
 
-import net.binangkit.payment.client.{defaultClient => client}
 import net.binangkit.payment.{Config, JsonApi}
 
 trait ScalajApi extends JsonApi with Config {
