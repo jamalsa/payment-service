@@ -69,7 +69,11 @@ trait ScalajApi extends JsonApi with Config {
         "bit62" -> ""
       )
 
-    val request = Http(url).postForm(data).header("Authorization", authHeader).option(HttpOptions.allowUnsafeSSL)
+    val request = Http(url).postForm(data)
+                  .header("Authorization", authHeader)
+                  .option(HttpOptions.allowUnsafeSSL)
+                  .option(HttpOptions.connTimeout(10000))
+                  .option(HttpOptions.readTimeout(50000))
 
     logger.debug(s"Request to $url: $request")
 
