@@ -26,7 +26,7 @@
 
   <shutdownHook/>
 
-  <root level="debug">
+  <root level="error">
     <appender-ref ref="ASYNC" />
   </root>
 </configuration>
