@@ -88,8 +88,8 @@ object Prepaid extends BasePrepaid with ScalajApi with JsonApi with DB {
   def updatePaymentToDB(id: String, ppid: String, data: PrepaidData) = {
     val q = sql"""
         update prepaid_transaction
-          set flag = 1, ppid = $ppid, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar}, meterai = ${data.meterai}, 
-          ppn = ${data.ppn}, ppj = ${data.ppj}, angsuran = ${data.angsuran}, 
+          set flag = 1, ppid = $ppid, idpel = ${data.idpel}, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar},
+          meterai = ${data.meterai}, ppn = ${data.ppn}, ppj = ${data.ppj}, angsuran = ${data.angsuran}, 
           rp_stroom_token = ${data.rpStroomToken}, jml_kwh = ${data.jmlKwh}, token = ${data.token}, 
           info_text = ${data.infoText}, payment_time=${data.transactionTime}
           where id = $id
