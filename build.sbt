@@ -8,7 +8,6 @@ lazy val root = (project in file(".")).
   settings(
     name := "binangkit-payment",
     organization := "net.binangkit",
-    version := "0.3.0-SNAPSHOT",
     scalaVersion := "2.11.7",
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-dsl" % http4sVersion,
