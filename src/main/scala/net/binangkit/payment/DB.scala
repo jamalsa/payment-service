@@ -15,6 +15,9 @@ trait DB extends Config {
     _ds.setJdbcUrl(dbConfig.getString("url"))
     _ds.setUsername(dbConfig.getString("user"))
     _ds.setPassword(dbConfig.getString("password"))
+    _ds.addDataSourceProperty("cachePrepStmts", "true")
+    _ds.addDataSourceProperty("prepStmtCacheSize", "256")
+    _ds.addDataSourceProperty("prepStmtCacheSqlLimit", "2048")
     _ds
   }
 
