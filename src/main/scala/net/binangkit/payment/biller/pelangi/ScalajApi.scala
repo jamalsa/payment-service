@@ -72,17 +72,15 @@ trait ScalajApi extends JsonApi with Config {
     val request = Http(url).postForm(data)
                   .header("Authorization", authHeader)
                   .option(HttpOptions.allowUnsafeSSL)
-                  .option(HttpOptions.connTimeout(10000))
-                  .option(HttpOptions.readTimeout(50000))
+                  .option(HttpOptions.connTimeout(20000))
+                  .option(HttpOptions.readTimeout(70000))
 
     logger.debug(s"Request to $url: $request")
 
-    val response = request.asString
+    val response = Task(request.asString)
 
-    logger.debug(s"Response from $url: $response")
-
-    val responseTask: Option[Task[A]] = response.isSuccess match {
-      case true => Parse.parseOption(response.body).map{json =>
+    response.flatMap{ resp => resp.isSuccess match {
+      case true => Parse.parseOption(resp.body).map{json =>
         val rc = json.field("data").flatMap(_.field("trx")).flatMap(_.field("rc")) match {
           case Some(rcVal) => {
             if (rcVal.isString) rcVal.stringOr("0005") 
@@ -105,10 +103,9 @@ trait ScalajApi extends JsonApi with Config {
           case _ => 
             Task.fail(new Throwable(s"""$rc;$rc;${json.field("data").flatMap(_.field("trx")).flatMap(_.field("desc")).getOrElse(jEmptyString).stringOrEmpty}"""))
         }
-      }
+      }.getOrElse(Task.fail(new Throwable("005;005;Error when parsing biller data")))
 
-      case false => Some(Task.fail(new Throwable(s"${response.code};${response.code};${response.code}")))
-    }
-    responseTask.getOrElse(Task.fail(new Throwable("0005;0005;"))).attemptRun
+      case false => Task.fail(new Throwable(s"${resp.code};${resp.code};${resp.code}"))
+    }}.attemptRun
   }
 }
