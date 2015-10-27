@@ -50,13 +50,15 @@ object Decoder {
 
   
   implicit def postpaidPaymentDecoder: DecodeJson[PostpaidData] =
-    jdecode9L(PostpaidData.apply)(
+    jdecode11L(PostpaidData.apply)(
       "subscriber_id", 
       "subscriber_name", 
       "bill_status", 
       "blth_summary", 
       "amount", 
       "admin_charge",
+      "subscriber_segmentation", 
+      "power", 
       "switcher_refno",
       "stand_meter_summary",
       "datetime"

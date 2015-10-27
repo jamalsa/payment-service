@@ -33,6 +33,8 @@ case class PostpaidData(
   blth:  String,
   tagihan: BigDecimal,
   admin: BigDecimal,
+  tarif: String = "",
+  daya: Int = 0,
   noRef: String = "",
   standMeter: String = "",
   rpBayar: BigDecimal = 0,
@@ -71,6 +73,8 @@ object PostpaidData {
     blth:  String,
     rpBayar: BigDecimal,
     admin: BigDecimal,
+    tarif: String,
+    daya: Int,
     noRef: String,
     standMeter: String,
     transactionTime: String
@@ -82,6 +86,8 @@ object PostpaidData {
         blth, 
         rpBayar - admin,
         admin,
+        tarif,
+        daya,
         noRef,
         standMeter,
         rpBayar,
@@ -119,7 +125,9 @@ object PostpaidPaymentEncoder {
         ("jumlah_tagihan" := p.jumlahTagihan) ->: 
         ("blth" := p.blth) ->: 
         ("tagihan" := p.tagihan) ->:        
-        ("admin" := p.admin) ->: 
+        ("admin" := p.admin) ->:       
+        ("tarif" := p.tarif) ->:       
+        ("daya" := p.daya) ->: 
         ("no_ref" := p.noRef) ->: 
         ("stand_meter" := p.standMeter) ->: 
         ("rp_bayar" := p.rpBayar) ->: 
