@@ -15,7 +15,8 @@ object Main extends App with Config with DB {
   def service = Router(
     "" -> rootService,
     "/api" -> api.service,
-    "/dummy/pelangi" -> biller.pelangi.dummy.Dummy.service
+    "/dummy/pelangi" -> biller.pelangi.dummy.Dummy.service,
+    "/benchmark" -> Benchmark.service
   )
 
   def rootService = HttpService {
