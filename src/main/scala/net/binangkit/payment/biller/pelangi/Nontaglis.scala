@@ -22,10 +22,12 @@ object Nontaglis extends BaseNontaglis with ScalajApi with JsonApi with DB {
     import Decoder.nontaglisInquiryDecoder
     import NontaglisInquiryEncoder.encoderOf
 
+    val ppid = request.params.getOrElse("ppid", "NOPPID")
+
     sendRequest[NontaglisData](customerNo, "", "2100") match {
       case \/-(p) => p match {
         case d: NontaglisData => {
-          insertInquiryToDB(d) match {
+          insertInquiryToDB(ppid, d) match {
             case \/-(u) => Ok(d)
             case -\/(t) => BadRequest(
               jsonError("0005", "0005", "Error when inserting inquiry data to database: " + t.getMessage)
@@ -53,7 +55,7 @@ object Nontaglis extends BaseNontaglis with ScalajApi with JsonApi with DB {
       sendRequest[NontaglisData](customerNo, nominal, trxType) match {
         case \/-(p) => p match {
           case d: NontaglisData => {
-            updatePaymentToDB(id, ppid, d) match {
+            updatePaymentToDB(id, d) match {
               case \/-(u) => Ok(d.copy(id=id))
               case -\/(t) => BadRequest(
                 jsonError("0005", "0005", "Error when inserting payment data to database: " + t.getMessage)
@@ -72,11 +74,11 @@ object Nontaglis extends BaseNontaglis with ScalajApi with JsonApi with DB {
 
   def adviceHandler(customerNo: String, request: Request): Task[Response] = paymentHandler(customerNo, request, "2220")
 
-  def insertInquiryToDB(data: NontaglisData) = {
+  def insertInquiryToDB(ppid: String, data: NontaglisData) = {
     val q = sql"""
         insert into nontaglis_transaction
-          (id, inquiry_time, nomor_registrasi, jenis_transaksi, nama, rp_bayar)
-          values(${data.id}, now(), ${data.nomorRegistrasi}, ${data.jenisTransaksi}, ${data.nama}, ${data.rpBayar})
+          (id, ppid, inquiry_time, nomor_registrasi, jenis_transaksi, nama, rp_bayar)
+          values(${data.id}, $ppid, now(), ${data.nomorRegistrasi}, ${data.jenisTransaksi}, ${data.nama}, ${data.rpBayar})
       """.update
 
     val p: Task[Unit] = for {
@@ -86,10 +88,10 @@ object Nontaglis extends BaseNontaglis with ScalajApi with JsonApi with DB {
   }
 
   
-  def updatePaymentToDB(id: String, ppid: String, data: NontaglisData) = {
+  def updatePaymentToDB(id: String, data: NontaglisData) = {
     val q = sql"""
         update nontaglis_transaction
-          set flag = 1, ppid = $ppid, tanggal_registrasi = ${data.tanggalRegistrasi},no_ref = ${data.noRef}, 
+          set flag = 1, tanggal_registrasi = ${data.tanggalRegistrasi},no_ref = ${data.noRef}, 
           idpel =  ${data.idpel}, biaya_pln = ${data.biayaPln}, admin = ${data.admin}, no_ref = ${data.noRef}, 
           info_text = ${data.infoText}, payment_time=${data.transactionTime}
           where id = $id

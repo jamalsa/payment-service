@@ -22,10 +22,12 @@ object Prepaid extends BasePrepaid with ScalajApi with JsonApi with DB {
     import Decoder.prepaidInquiryDecoder
     import PrepaidInquiryEncoder.encoderOf
 
+    val ppid = request.params.getOrElse("ppid", "NOPPID")
+
     sendRequest[PrepaidData](customerNo, "", "2100") match {
       case \/-(p) => p match {
         case d: PrepaidData => {
-          insertInquiryToDB(d) match {
+          insertInquiryToDB(ppid, d) match {
             case \/-(u) => Ok(d)
             case -\/(t) => BadRequest(
               jsonError("0005", "0005", "Error when inserting inquiry data to database: " + t.getMessage)
@@ -53,7 +55,7 @@ object Prepaid extends BasePrepaid with ScalajApi with JsonApi with DB {
       sendRequest[PrepaidData](customerNo, nominal, trxType) match {
         case \/-(p) => p match {
           case d: PrepaidData => {
-            updatePaymentToDB(id, ppid, d) match {
+            updatePaymentToDB(id, d) match {
               case \/-(u) => Ok(d.copy(id=id))
               case -\/(t) => BadRequest(
                 jsonError("0005", "0005", "Error when inserting payment data to database: " + t.getMessage)
@@ -72,11 +74,11 @@ object Prepaid extends BasePrepaid with ScalajApi with JsonApi with DB {
 
   def adviceHandler(customerNo: String, request: Request): Task[Response] = paymentHandler(customerNo, request, "2220")
 
-  def insertInquiryToDB(data: PrepaidData) = {
+  def insertInquiryToDB(ppid: String, data: PrepaidData) = {
     val q = sql"""
         insert into prepaid_transaction
-          (id, inquiry_time, nomor_meter, nama, tarif, daya, admin)
-          values(${data.id}, now(), ${data.nomorMeter}, ${data.nama}, ${data.tarif}, ${data.daya}, ${data.admin})
+          (id, ppid, inquiry_time, nomor_meter, nama, tarif, daya, admin)
+          values(${data.id}, $ppid, now(), ${data.nomorMeter}, ${data.nama}, ${data.tarif}, ${data.daya}, ${data.admin})
       """.update
 
     val p: Task[Unit] = for {
@@ -85,10 +87,10 @@ object Prepaid extends BasePrepaid with ScalajApi with JsonApi with DB {
     p.attemptRun
   }
 
-  def updatePaymentToDB(id: String, ppid: String, data: PrepaidData) = {
+  def updatePaymentToDB(id: String, data: PrepaidData) = {
     val q = sql"""
         update prepaid_transaction
-          set flag = 1, ppid = $ppid, idpel = ${data.idpel}, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar},
+          set flag = 1, idpel = ${data.idpel}, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar},
           meterai = ${data.meterai}, ppn = ${data.ppn}, ppj = ${data.ppj}, angsuran = ${data.angsuran}, 
           rp_stroom_token = ${data.rpStroomToken}, jml_kwh = ${data.jmlKwh}, token = ${data.token}, 
           info_text = ${data.infoText}, payment_time=${data.transactionTime}

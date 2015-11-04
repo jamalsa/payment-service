@@ -22,10 +22,12 @@ object Postpaid extends BasePostpaid with ScalajApi with JsonApi with DB {
     import Decoder.postpaidInquiryDecoder
     import PostpaidInquiryEncoder.encoderOf
 
+    val ppid = request.params.getOrElse("ppid", "NOPPID")
+
     sendRequest[PostpaidData](customerNo, "", "2100") match {
       case \/-(p) => p match {
         case d: PostpaidData => {
-          insertInquiryToDB(d) match {
+          insertInquiryToDB(ppid, d) match {
             case \/-(u) => Ok(d)
             case -\/(t) => BadRequest(
               jsonError("0005", "0005", "Error when inserting inquiry data to database: " + t.getMessage)
@@ -53,7 +55,7 @@ object Postpaid extends BasePostpaid with ScalajApi with JsonApi with DB {
       sendRequest[PostpaidData](customerNo, nominal, trxType) match {
         case \/-(p) => p match {
           case d: PostpaidData => {
-            updatePaymentToDB(id, ppid, d) match {
+            updatePaymentToDB(id, d) match {
               case \/-(u) => Ok(d)
               case -\/(t) => BadRequest(
                 jsonError("0005", "0005", "Error when inserting inquiry data to database: " + t.getMessage)
@@ -72,11 +74,11 @@ object Postpaid extends BasePostpaid with ScalajApi with JsonApi with DB {
 
   def adviceHandler(customerNo: String, request: Request): Task[Response] = paymentHandler(customerNo, request, "2220")
 
-  def insertInquiryToDB(data: PostpaidData) = {
+  def insertInquiryToDB(ppid: String, data: PostpaidData) = {
     val q = sql"""
         insert into postpaid_transaction
-          (id, inquiry_time, idpel, nama, jumlah_tagihan, blth, tagihan, admin)
-          values(${data.id}, now(), ${data.idpel}, ${data.nama}, ${data.jumlahTagihan}, ${data.blth}, ${data.tagihan}, ${data.admin})
+          (id, ppid, inquiry_time, idpel, nama, jumlah_tagihan, blth, tagihan, admin)
+          values(${data.id}, $ppid, now(), ${data.idpel}, ${data.nama}, ${data.jumlahTagihan}, ${data.blth}, ${data.tagihan}, ${data.admin})
       """.update
 
     val p: Task[Unit] = for {
@@ -86,10 +88,10 @@ object Postpaid extends BasePostpaid with ScalajApi with JsonApi with DB {
   }
 
   
-  def updatePaymentToDB(id: String, ppid: String, data: PostpaidData) = {
+  def updatePaymentToDB(id: String, data: PostpaidData) = {
     val q = sql"""
         update postpaid_transaction
-          set flag = 1, ppid = $ppid, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar}, stand_meter = ${data.standMeter},  
+          set flag = 1, no_ref = ${data.noRef}, rp_bayar =  ${data.rpBayar}, stand_meter = ${data.standMeter},  
           info_text = ${data.infoText}, payment_time=${data.transactionTime}
           where id = $id
       """.update
