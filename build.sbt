@@ -1,6 +1,6 @@
 import ReleaseTransformations._
 
-lazy val http4sVersion = "0.10.1"
+lazy val http4sVersion = "0.11.0-SNAPSHOT"
 lazy val doobieVersion = "0.2.2"
 
 lazy val root = (project in file(".")).
@@ -20,7 +20,7 @@ lazy val root = (project in file(".")).
       "mysql" % "mysql-connector-java" % "5.1.36",
       "com.typesafe" % "config" % "1.3.0",
       "ch.qos.logback" % "logback-classic" % "1.0.13",
-      "org.log4s" %% "log4s" % "1.1.5",
+      "org.log4s" %% "log4s" % "1.2.0",
       "org.scalaj" %% "scalaj-http" % "1.1.5"
     ),
     seq(Revolver.settings: _*),

@@ -13,11 +13,13 @@ import org.http4s.Status.ResponseClass.Successful
 import org.http4s._
 import org.http4s.dsl._
 import org.http4s.client._
-import org.http4s.client.blaze.{defaultClient => client}
+import org.http4s.client.blaze.SimpleHttp1Client
 
 import net.binangkit.payment.{Config, JsonApi}
 
 trait Api extends JsonApi with Config {
+
+  val client = SimpleHttp1Client(endpointAuthentication = false)
 
   def paymentHandler(customerNo: String, request: Request): Task[Response] = 
     paymentHandler(customerNo, request, "2200")
@@ -85,14 +87,17 @@ trait Api extends JsonApi with Config {
             val data = json.field("data").flatMap(_.field("trx")).getOrElse(jEmptyObject)
             data.field("msg_type").getOrElse(jEmptyString).stringOrEmpty match {
               case "REVERSAL" => jsonError("0063", "0063", "Transaksi Gagal")
-              case _ => data.as[A].value.getOrElse(jsonError("0005", "0005", "Error when parsing biller data"))
+              case _ => data.as[A].value match{
+                case Some(aData) => Task.now(aData)
+                case None => Task.fail(new Throwable("005;005;Error when parsing biller data"))
+              }
             }            
           }
           case _ => 
-            jsonError(rc, rc, json.field("data").flatMap(_.field("trx")).flatMap(_.field("desc")).getOrElse(jEmptyString).stringOrEmpty)
+            Task.fail(new Throwable(s"""$rc;$rc;${json.field("data").flatMap(_.field("trx")).flatMap(_.field("desc")).getOrElse(jEmptyString).stringOrEmpty}"""))
         }
       }
-      case resp => Task.now(jsonError(resp.status.code.toString, resp.status.reason, ""))
+      case resp => Task.fail(new Throwable(s"${resp.status.code};${resp.status.code};${resp.status.code}"))
     }.attemptRun
   }
 }
