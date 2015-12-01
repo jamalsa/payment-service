@@ -14,7 +14,7 @@ import doobie.imports._
 import net.binangkit.payment.{DB, JsonApi}
 import net.binangkit.payment.api.pln.{Prepaid => BasePrepaid, PrepaidData, PrepaidInquiryEncoder, PrepaidPaymentEncoder}
 
-object Prepaid extends BasePrepaid with Api with JsonApi with DB {
+object Prepaid extends BasePrepaid with ScalajApi with JsonApi with DB {
   val productId = pelangiConfig.getString("product.prepaid")
 
   def inquiryHandler(customerNo: String, request: Request): Task[Response] = {

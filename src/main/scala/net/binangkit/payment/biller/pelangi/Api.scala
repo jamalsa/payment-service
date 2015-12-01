@@ -13,13 +13,11 @@ import org.http4s.Status.ResponseClass.Successful
 import org.http4s._
 import org.http4s.dsl._
 import org.http4s.client._
-import org.http4s.client.blaze.SimpleHttp1Client
+import org.http4s.client.blaze.{defaultClient => client}
 
 import net.binangkit.payment.{Config, JsonApi}
 
 trait Api extends JsonApi with Config {
-
-  val client = SimpleHttp1Client(endpointAuthentication = false)
 
   def paymentHandler(customerNo: String, request: Request): Task[Response] = 
     paymentHandler(customerNo, request, "2200")

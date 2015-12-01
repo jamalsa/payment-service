@@ -1,6 +1,6 @@
 import ReleaseTransformations._
 
-lazy val http4sVersion = "0.11.0-SNAPSHOT"
+lazy val http4sVersion = "0.10.1"
 lazy val doobieVersion = "0.2.2"
 
 lazy val root = (project in file(".")).
