@@ -75,37 +75,40 @@ trait ScalajApi extends JsonApi with Config {
                   .option(HttpOptions.connTimeout(20000))
                   .option(HttpOptions.readTimeout(70000))
 
-    logger.debug(s"Request to $url: $request")
+    logger.info(s"Biller Request to [$url]: $request")
 
     val response = Task(request.asString)
 
-    response.flatMap{ resp => resp.isSuccess match {
-      case true => Parse.parseOption(resp.body).map{json =>
-        val rc = json.field("data").flatMap(_.field("trx")).flatMap(_.field("rc")) match {
-          case Some(rcVal) => {
-            if (rcVal.isString) rcVal.stringOr("0005") 
-            else if (rcVal.isObject) rcVal.objectValuesOr(List(jString("0005")))(0).stringOr("0005") 
-            else "0005"
+    response.flatMap{ resp => 
+      logger.info(s"Biller Response from [$url]: $resp.code\n\t$resp.body")
+      resp.isSuccess match {
+        case true => Parse.parseOption(resp.body).map{json =>
+          val rc = json.field("data").flatMap(_.field("trx")).flatMap(_.field("rc")) match {
+            case Some(rcVal) => {
+              if (rcVal.isString) rcVal.stringOr("0005") 
+              else if (rcVal.isObject) rcVal.objectValuesOr(List(jString("0005")))(0).stringOr("0005") 
+              else "0005"
+            }
+            case None => "0005"
           }
-          case None => "0005"
-        }
-        rc match {
-          case "0000" => {
-            val data = json.field("data").flatMap(_.field("trx")).getOrElse(jEmptyObject)
-            data.field("msg_type").getOrElse(jEmptyString).stringOrEmpty match {
-              case "REVERSAL" => Task.fail(new Throwable("0063;0063;Transaksi Gagal"))
-              case _ => data.as[A].value match{
-                case Some(aData) => Task.now(aData)
-                case None => Task.fail(new Throwable("005;005;Error when parsing biller data"))
-              }
-            }            
+          rc match {
+            case "0000" => {
+              val data = json.field("data").flatMap(_.field("trx")).getOrElse(jEmptyObject)
+              data.field("msg_type").getOrElse(jEmptyString).stringOrEmpty match {
+                case "REVERSAL" => Task.fail(new Throwable("0063;0063;Transaksi Gagal"))
+                case _ => data.as[A].value match{
+                  case Some(aData) => Task.now(aData)
+                  case None => Task.fail(new Throwable("005;005;Error when parsing biller data"))
+                }
+              }            
+            }
+            case _ => 
+              Task.fail(new Throwable(s"""$rc;$rc;${json.field("data").flatMap(_.field("trx")).flatMap(_.field("desc")).getOrElse(jEmptyString).stringOrEmpty}"""))
           }
-          case _ => 
-            Task.fail(new Throwable(s"""$rc;$rc;${json.field("data").flatMap(_.field("trx")).flatMap(_.field("desc")).getOrElse(jEmptyString).stringOrEmpty}"""))
-        }
-      }.getOrElse(Task.fail(new Throwable("005;005;Error when parsing biller data")))
+        }.getOrElse(Task.fail(new Throwable("005;005;Error when parsing biller data")))
 
-      case false => Task.fail(new Throwable(s"${resp.code};${resp.code};${resp.code}"))
-    }}.attemptRun
+        case false => Task.fail(new Throwable(s"${resp.code};${resp.code};${resp.code}"))
+      }
+    }.attemptRun
   }
 }
